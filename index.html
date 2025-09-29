@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Riddle Game</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🧩 Riddle Game</h1>
+
+  <div id="game">
+    <p id="score">Score: 0</p>
+    <p id="riddle"></p>
+    <input type="text" id="answerInput" placeholder="Type your answer here" />
+    <button id="submitBtn">Submit</button>
+<button id="skipBtn">Skip</button>
+    <p id="feedback"></p>
+    <button id="restartBtn" style="display: none;">Restart</button>
+    <button id="nextBtn" style="display:none;">Next Riddle</button>
+  </div>
+
+  <script>
+const riddles = [
+  { question: "I speak without a mouth and hear without ears. What am I?", answer: "echo" },
+  { question: "The more of me you take, the more you leave behind. What am I?", answer: "footsteps" },
+  { question: "What has to be broken before you can use it?", answer: "egg" },
+  { question: "I’m tall when I’m young and short when I’m old. What am I?", answer: "candle" },
+  { question: "What gets wetter the more it dries?", answer: "towel" },
+  { question: "What can travel around the world while staying in a corner?", answer: "stamp" },
+  { question: "What has hands but cannot clap?", answer: "clock" },
+  { question: "What has keys but can’t open locks?", answer: "piano" },
+  { question: "What runs but never walks, has a bed but never sleeps?", answer: "river" },
+  { question: "What has a heart that doesn’t beat?", answer: "artichoke" },
+  { question: "I’m found in socks, scarves, and mittens; I’m also the name of a sheep. What am I?", answer: "wool" },
+  { question: "What building has the most stories?", answer: "library" },
+  { question: "What goes up but never comes down?", answer: "age" },
+  { question: "The more you take out of me, the bigger I get. What am I?", answer: "hole" },
+  { question: "What can fill a room but takes up no space?", answer: "light" },
+  { question: "What has many teeth but can’t bite?", answer: "comb" },
+  { question: "What comes down but never goes up?", answer: "rain" },
+  { question: "I’m always in front of you but can’t be seen. What am I?", answer: "future" },
+  { question: "What has an eye but cannot see?", answer: "needle" },
+  { question: "What is always moving but never gets tired?", answer: "time" },
+  { question: "I’m full of holes but I can hold water. What am I?", answer: "sponge" },
+  { question: "The more you share me, the less I become. What am I?", answer: "secret" },
+  { question: "What can you catch but not throw?", answer: "cold" },
+  { question: "I’m light as a feather, yet the strongest man can’t hold me for long. What am I?", answer: "breath" },
+  { question: "What goes up and down but never moves?", answer: "staircase" },
+  { question: "What has one head, one foot, and four legs?", answer: "bed" },
+  { question: "I have cities but no houses, mountains but no trees, and water but no fish. What am I?", answer: "map" },
+  { question: "What can’t talk but will reply when spoken to?", answer: "echo" },
+  { question: "The more you take, the more you leave behind. What am I?", answer: "footsteps" },
+  { question: "What has no beginning, end, or middle?", answer: "circle" },
+  { question: "What belongs to you but others use it more?", answer: "name" },
+  { question: "I have branches but no fruit, trunk, or leaves. What am I?", answer: "bank" },
+  { question: "What gets sharper the more you use it?", answer: "brain" },
+  { question: "What has a neck but no head?", answer: "bottle" },
+  { question: "What can run but never walks and has a mouth but never talks?", answer: "river" },
+  { question: "What can you break without touching it?", answer: "promise" },
+  { question: "I’m always in the past but never in the future. What am I?", answer: "history" },
+  { question: "I have keys but no locks and space but no room. What am I?", answer: "keyboard" },
+  { question: "What has an end but no beginning?", answer: "rope" },
+  { question: "What is always coming but never arrives?", answer: "tomorrow" },
+  { question: "I’m invisible, weigh nothing, but if you put me in a barrel I make it lighter. What am I?", answer: "hole" },
+  { question: "What can fly without wings?", answer: "time" },
+  { question: "What has four wheels and flies?", answer: "garbage truck" },
+  { question: "What is black when it’s clean and white when it’s dirty?", answer: "chalkboard" },
+];
+
+const riddleEl = document.getElementById('riddle');
+const answerInput = document.getElementById('answerInput');
+const feedbackEl = document.getElementById('feedback');
+const submitBtn = document.getElementById('submitBtn');
+const nextBtn = document.getElementById('nextBtn');
+const skipBtn = document.getElementById('skipBtn');
+const restartBtn = document.getElementById('restartBtn'); // NEW
+const scoreEl = document.getElementById('score');
+
+let current = 0;
+let score = 0;
+
+function loadRiddle() {
+  riddleEl.textContent = riddles[current].question;
+  answerInput.value = '';
+  feedbackEl.textContent = '';
+  nextBtn.style.display = 'none';
+  answerInput.style.display = 'inline-block';
+  submitBtn.style.display = 'inline-block';
+  skipBtn.style.display = 'inline-block';
+  restartBtn.style.display = 'none';  // hide restart during play
+}
+
+function updateScore() {
+  scoreEl.textContent = 'Score: ${score}';
+}
+
+function endGame() {
+  riddleEl.textContent = '🎉 Game Over! Final Score: ${score}/${riddles.length}';
+  answerInput.style.display = 'none';
+  submitBtn.style.display = 'none';
+  nextBtn.style.display = 'none';
+  skipBtn.style.display = 'none';
+  restartBtn.style.display = 'inline-block'; // show restart
+}
+
+function goNext() {
+  current++;
+  if (current < riddles.length) {
+    loadRiddle();
+  } else {
+    endGame();
+  }
+}
+
+// Game flow
+loadRiddle();
+updateScore();
+
+submitBtn.addEventListener('click', () => {
+  const guess = answerInput.value.trim().toLowerCase();
+  const correct = riddles[current].answer;
+
+  if (guess === correct) {
+    feedbackEl.textContent = "✅ Correct!";
+    score++;
+    updateScore();
+    nextBtn.style.display = current < riddles.length - 1 ? 'inline-block' : 'none';
+  } else {
+    feedbackEl.textContent = "❌ Not quite, try again!";
+  }
+});
+
+nextBtn.addEventListener('click', goNext);
+skipBtn.addEventListener('click', goNext);
+
+// NEW: Restart logic
+restartBtn.addEventListener('click', () => {
+  current = 0;
+  score = 0;
+  updateScore();
+  loadRiddle();
+});
+  </script>
+</body>
+</html>
